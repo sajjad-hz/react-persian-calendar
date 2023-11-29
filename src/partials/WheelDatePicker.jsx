@@ -1,14 +1,16 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { useKeenSlider } from "keen-slider/react";
 import "./WheelDatePicker.css";
+import latinToPersianNumber from "../utils/persianNumbers";
 
-export default function Wheel(props) {
+export default function Wheel({setUpdateValue, ...props}) {
   const perspective = props.perspective || "center";
   const wheelSize = 20;
   const slides = props.length;
   const slideDegree = 360 / wheelSize;
   const slidesPerView = props.loop ? 9 : 1;
-  const [sliderState, setSliderState] = React.useState(null);
+  const [sliderState, setSliderState] = useState(null);
+  const [activeSlideIndex, setActiveSlideIndex] = useState(0);
   const size = useRef(0);
   const options = useRef({
     slides: {
@@ -40,9 +42,7 @@ export default function Wheel(props) {
       setSliderState(s.track.details);
     },
     animationEnded: (s) => {
-      console.log(s)
-      console.log("dragEnded", s.track.details.abs);
-      return s.track.details.abs;
+      setActiveSlideIndex(s.track.absToRel(s.track.details.abs))
     },
     rubberband: !props.loop,
     mode: "free-snap",
@@ -50,9 +50,9 @@ export default function Wheel(props) {
 
   const [sliderRef, slider] = useKeenSlider(options.current);
 
-  const [radius, setRadius] = React.useState(0);
+  const [radius, setRadius] = useState(0);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (slider.current) setRadius(slider.current.size / 2);
   }, [slider]);
 
@@ -75,12 +75,28 @@ export default function Wheel(props) {
       };
       const value = props.setValue
         ? props.setValue(i, sliderState.abs + Math.round(distance))
-        : i;
+        : i + 1;
       values.push({ style, value });
     }
     return values;
   }
 
+  useEffect(() => {
+    const activeValue = slideValues()[activeSlideIndex]?.value
+    setUpdateValue((prev) => ({
+      ...prev,
+      [props.unit]: `${activeValue}`
+    }))
+  }, [activeSlideIndex])
+
+
+  useEffect(() => {
+    setUpdateValue((prev) => ({
+      ...prev,
+      [props.unit]: `${props?.setValue ? props.setValue() : props.initIdx ? props.initIdx + 1 : slides}`
+    }))
+  }, [])
+  
   return (
     <div
       className={"wheel keen-slider wheel--perspective-" + perspective}
@@ -97,8 +113,9 @@ export default function Wheel(props) {
         <div className="wheel__slides" style={{ width: props.width + "px" }}>
           {slideValues().map(({ style, value }, idx) => (
             <div className="wheel__slide" style={style} key={idx}>
-              <span>{value}</span>
+              <span>{latinToPersianNumber(value)}</span>
             </div>
+            
           ))}
         </div>
         {props.label && (

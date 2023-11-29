@@ -1,20 +1,16 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Wheel from "./partials/WheelDatePicker";
-import moment, { usePersian } from "moment-jalaali";
-import latinToPersianNumber from "./utils/persianNumbers";
-import daysInMonth from "./components/daysInMonth";
+import moment from "moment-jalaali";
 
 const App = () => {
-  const today = moment().format("jYYYY-jM-jD").toLocaleString();
-  console.log("today", today);
+  const [updateValue, setUpdateValue] = useState();
+  const [numberOfDaysInMonth, setNumberOfDaysInMonth] = useState(
+    moment.jDaysInMonth(moment().jYear, moment().jMonth())
+  );
 
-  const date = {
-    month: Number(moment().format("jM")) - 1,
-  };
-
-  console.log("date.month", date.month);
-
-  moment.loadPersian({ usePersianDigits: true }); // after this line all digits convert to persian string
+  if (updateValue) {
+    console.log("full", Object.values(updateValue).join("/"));
+  }
 
   function formatYear(_relative, absolute) {
     return moment().subtract(absolute, "years").format("jYYYY");
@@ -24,16 +20,13 @@ const App = () => {
     return moment().subtract(absolute, "months").format("jM");
   }
 
-  function formatDay(_relative, absolute) {
-    const numberOfDays = moment.jDaysInMonth(1395, 11)
+  useEffect(() => {
+    const persianMonth = +updateValue?.month - 1;
+    const persianYear = +updateValue?.year;
+    const numberOfDays = moment.jDaysInMonth(persianYear, persianMonth);
     console.log('numberOfDays', numberOfDays)
-    return moment().subtract(absolute, "days").format("jD");
-  }
-
-  console.log(moment.jDaysInMonth(1391, 11));
-
-  const days = moment.jDaysInMonth();
-  // console.log('days', days)
+    setNumberOfDaysInMonth(numberOfDays);
+  }, [updateValue?.month, updateValue?.year]);
 
   return (
     <div
@@ -50,21 +43,31 @@ const App = () => {
           loop
           length={12}
           width={140}
-          perspective="left"
+          // perspective="left"
           setValue={formatYear}
-          
+          setUpdateValue={setUpdateValue}
+          unit="year"
         />
-      </div>
-      <div style={{ width: 70, height: 180 }}>
-        <Wheel loop length={12} width={23} setValue={formatMonth} />
       </div>
       <div style={{ width: 70, height: 180 }}>
         <Wheel
           loop
           length={12}
           width={23}
-          setValue={formatDay}
+          setValue={formatMonth}
+          setUpdateValue={setUpdateValue}
+          unit="month"
+        />
+      </div>
+      <div style={{ width: 70, height: 180 }}>
+        <Wheel
+          loop
+          length={numberOfDaysInMonth}
+          width={23}
           perspective="left"
+          setUpdateValue={setUpdateValue}
+          initIdx={moment().jDate() - 1}
+          unit="day"
         />
       </div>
     </div>

@@ -1,6 +1,5 @@
 export default function latinToPersianNumber(latinNumber) {
-
-  let string = latinNumber?.toString() || '';
+  let string = latinNumber?.toString() || "";
 
   const latinToPersianMap = {
     0: "۰",
