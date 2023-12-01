@@ -93,7 +93,7 @@ export default function Wheel({setUpdateValue, ...props}) {
   useEffect(() => {
     setUpdateValue((prev) => ({
       ...prev,
-      [props.unit]: `${props?.setValue ? props.setValue() : props.initIdx ? props.initIdx + 1 : slides}`
+      [props.unit]: `${props.unit === 'day' ?props.initIdx + 1: props?.setValue ? props.setValue() : props.initIdx ? props.initIdx + 1 : slides}`
     }))
   }, [])
   

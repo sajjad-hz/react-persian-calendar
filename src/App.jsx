@@ -8,6 +8,7 @@ const App = () => {
     moment.jDaysInMonth(moment().jYear, moment().jMonth())
   );
 
+  // TODO: add full date and miliseconds to the updateValue object
   if (updateValue) {
     console.log("full", Object.values(updateValue).join("/"));
   }
@@ -18,6 +19,11 @@ const App = () => {
 
   function formatMonth(_relative, absolute) {
     return moment().subtract(absolute, "months").format("jM");
+  }
+
+  function formatDays(_relative, absolute) {
+    const calculatedDay = ((absolute % numberOfDaysInMonth) + numberOfDaysInMonth) % numberOfDaysInMonth + 1;
+    return calculatedDay;
   }
 
   useEffect(() => {
@@ -62,7 +68,8 @@ const App = () => {
       <div style={{ width: 70, height: 180 }}>
         <Wheel
           loop
-          length={numberOfDaysInMonth}
+          length={10}
+          setValue={formatDays}
           width={23}
           perspective="left"
           setUpdateValue={setUpdateValue}
