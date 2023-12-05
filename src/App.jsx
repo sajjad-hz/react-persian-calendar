@@ -22,8 +22,9 @@ const App = () => {
   }
 
   function formatDays(_relative, absolute) {
-    const calculatedDay = ((absolute % numberOfDaysInMonth) + numberOfDaysInMonth) % numberOfDaysInMonth + 1;
-    return calculatedDay;
+    const day = (((absolute + numberOfDaysInMonth - 1) % numberOfDaysInMonth) + numberOfDaysInMonth) % numberOfDaysInMonth;
+    const reversedDay = numberOfDaysInMonth - day;
+    return reversedDay === 0 ? numberOfDaysInMonth : reversedDay;
   }
 
   useEffect(() => {
@@ -47,7 +48,7 @@ const App = () => {
       <div style={{ width: 70, height: 180 }}>
         <Wheel
           loop
-          length={12}
+          length={10}
           width={140}
           // perspective="left"
           setValue={formatYear}
@@ -58,7 +59,7 @@ const App = () => {
       <div style={{ width: 70, height: 180 }}>
         <Wheel
           loop
-          length={12}
+          length={10}
           width={23}
           setValue={formatMonth}
           setUpdateValue={setUpdateValue}
@@ -73,7 +74,7 @@ const App = () => {
           width={23}
           perspective="left"
           setUpdateValue={setUpdateValue}
-          initIdx={moment().jDate() - 1}
+          initIdx={numberOfDaysInMonth - moment().jDate() +1 }  
           unit="day"
         />
       </div>
